@@ -27,26 +27,45 @@ spec:
       serviceAccountName: {{ include "busypod.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: 
+            - 'sh'
+            - '-c' 
+            - "for i in `seq 1 {{ .Values.fileCount }}`; do size=$(</dev/urandom tr -dc 0-9 | head -c 4); filename=/data/file-$i-$size; head -c $size </dev/urandom > $filename; done"
+          volumeMounts:
+            - name: busypod
+              mountPath: /data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["watch"]
+          args: ["ls", "/busypod"]
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: busypod
+              mountPath: /busypod
+      volumes:
+        - name: busypod
+          persistentVolumeClaim:
+            claimName: {{ include "busypod.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
