@@ -1,3 +1,14 @@
 apiVersion: v1
-entries: {}
-generated: "2022-11-17T03:17:02.010873581-03:00"
+entries:
+  busypod:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-11-17T03:28:08.649348361-03:00"
+    description: A Helm chart for Kubernetes
+    digest: d09dad652eeb6b775057a641f8b44da88d6d29afa0c6f208b84e53a5734fd468
+    name: busypod
+    type: application
+    urls:
+    - https://github.com/juanpsm/busypod/busypod-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-11-17T03:28:08.648261211-03:00"
